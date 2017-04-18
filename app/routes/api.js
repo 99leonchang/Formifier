@@ -4,6 +4,8 @@
     ---
     (c) 2017 Leon Chang
  */
+var express 	= require('express');
+var app         = express();
 var config      = require('../../config');
 var jwt         = require('jsonwebtoken');
 var mongoose    = require('mongoose');
