@@ -4,13 +4,15 @@
     ---
     (c) 2017 Leon Chang
  */
+var express 	= require('express');
+var app         = express();
 var config      = require('../../config');
 var jwt         = require('jsonwebtoken');
 var mongoose    = require('mongoose');
 var bcrypt      = require('bcrypt');
 var Form        = require('../models/forms');
 var User        = require('../models/user');
-
+app.set('superSecret', config.secret);
 //----- Authentication -----//
 exports.middleware = function(req, res, next) {
 
@@ -21,7 +23,7 @@ exports.middleware = function(req, res, next) {
     if (token) {
 
         // verifies secret and checks exp
-        jwt.verify(token, config.secret, function(err, decoded) {
+        jwt.verify(token, app.get('superSecret'), function(err, decoded) {
             if (err) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {

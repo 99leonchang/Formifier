@@ -25,6 +25,7 @@ app.use(morgan('dev'));
 app.get('/', routes.basic);
 
 //Tests
+app.post('/setup', routes.api.user_create); //Insecure, remove later
 app.get('/remove', routes.test_remove);
 
 //Submission
