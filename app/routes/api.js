@@ -117,6 +117,7 @@ exports.form_create = function(req, res) {
     var form = new Form({
         userID: req.decoded._id,
         name : req.body.name,
+        redir_page : req.body.redir_page,
         active : true
     });
     form.save(function(err) {
@@ -131,6 +132,7 @@ exports.form_update = function(req, res) {
         if (err) return res.json({success: false, message: err});
 
         form.name     = req.body.name;
+        form.redir_page = req.body.redir_page;
         form.active   = req.body.active;
 
         form.save(function(err) {
