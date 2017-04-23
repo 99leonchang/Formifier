@@ -1,10 +1,12 @@
 var express 	= require('express');
 var app         = express();
 var bodyParser  = require('body-parser');
+var mustacheExpress = require('mustache-express');
 var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var helmet      = require('helmet');
-var cors = require('cors')
+var cors = require('cors');
+var path = require('path');
 
 var config = require('./config');
 //Routes
@@ -23,8 +25,8 @@ app.use(morgan('dev'));
 
 //===== Route Handlers =====//
 
-//Frontend
-app.get('/', routes.basic);
+//Frontend Static Files
+app.use(express.static(path.join(__dirname, 'views')));
 
 //Tests
 app.post('/setup', routes.api.user_create); //Insecure, remove later

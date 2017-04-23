@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Formifier - Form</title>
+
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <style>
+        body > .ui.container {
+            margin-top: 3em;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="api.js"></script>
+    <script>
+        //TODO: Authentication
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OGY2MmU5NGEzMzIxNDAwMTE5MzVlNTMiLCJ1c2VybmFtZSI6ImFkbWluIiwibmFtZSI6ImFkbWluIiwiZW1haWwiOiI5OWxlb25jaGFuZ0BnbWFpbC5jb20iLCJpYXQiOjE0OTI5NTA2MDgsImV4cCI6MTQ5MzAzNzAwOH0.Osr0oLJ6IEvo4V-OZH36E4LDULt7KpELhzVdUQtXxBg';
+        $(document).ready(function () {
+            console.log($_GET('id'));
+            //TODO: ID grabbing
+            custom_api('/forms/'+$_GET('id'), 'GET', function(data) {
+                populate(data[0]);
+                //$('#test').html(JSON.stringify(data));
+            });
+
+            $('.secondary.vertical.pointing.menu .item').tab();
+
+        });
+
+
+        function $_GET(param) {
+            var vars = {};
+            window.location.href.replace( location.hash, '' ).replace(
+                /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                function( m, key, value ) { // callback
+                    vars[key] = value !== undefined ? value : '';
+                }
+            );
+
+            if ( param ) {
+                return vars[param] ? vars[param] : null;
+            }
+            return vars;
+        }
+
+        function populate(form_data) {
+            $('#page_name').html(form_data.name);
+            $('#name').val(form_data.name);
+            $('#redir_page').val(form_data.redir_page);
+            $('#form_loader').removeClass('active');
+        }
+
+
+
+    </script>
+</head>
+<body>
+<div class="ui main container">
+    <div class="ui active inverted dimmer" id="form_loader">
+        <div class="ui text loader">Loading</div>
+    </div>
+
+        <div class="row">
+            <h1 class="ui centered header" id="page_name">Loading...</h1>
+        </div>
+        <br/>
+
+    <div class="ui stackable grid container">
+        <div class="row">
+            <div class="four wide column">
+                <div class="ui secondary vertical pointing menu">
+                    <a class="item active" data-tab="forms" data-id="test">
+                        At-A-Glance
+                    </a>
+                    <a class="item" data-tab="submissions">
+                        Submissions
+                    </a>
+                    <a class="item" data-tab="settings">
+                        Settings
+                    </a>
+                </div>
+            </div>
+
+            <div class="twelve wide column">
+
+                <div class="ui tab active center aligned" data-tab="first">
+                    <div class="ui message">
+                        <div class="header">
+                            Changes in service
+                        </div>
+                        <p id="textbox">Due to a database bug, we have disabled deletion of applications.</p>
+                    </div>
+                    <div class="ui follow button" data-id="22">Test</div>
+                    <div class="ui statistic">
+                        <div class="value">
+                            <?= $num_app ?>
+                        </div>
+                        <div class="label">
+                            Applications
+                        </div>
+                    </div>
+                    <div class="ui statistic">
+                        <div class="value">
+                            <?= $num_approve ?>
+                        </div>
+                        <div class="label">
+                            Approved Members
+                        </div>
+                    </div>
+                    <p>UCD Admin system is currently in Beta. If any problems occur, please report them to <a href="mailto:me@99leonchang.com">Leon</a>.</p>
+                </div>
+                <div class="ui tab" data-tab="second">
+                    <div class="row">
+                        <div class="column">
+                            <div class="ui message">
+                                <div class="header" id="jsondata">
+                                    Changes in service
+                                </div>
+                                <p>Due to a database bug, we have disabled deletion of applications.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui tab" data-tab="settings">
+                    <div class="row">
+                        <div class="column">
+                            <div class="ui dividing header">Settings</div>
+                            <form class="ui form" id="form_settings">
+                                <div class="field">
+                                    <label>Form Name</label>
+                                    <input type="text" name="name" value="Default Name" id="name">
+                                </div>
+                                <div class="field">
+                                    <label>Redirect page (optional)</label>
+                                    <input type="url" name="redir_page" value="" id="redir_page">
+                                </div>
+                                    <button class="ui positive large right labeled icon submit button" type="submit">
+                                        Save
+                                        <i class="save icon"></i>
+                                    </button>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+</div>
+</body>
+</html>

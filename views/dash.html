@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Formifier - Dashboard</title>
+
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <style>
+        body > .ui.container {
+            padding: 3em;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="api.js"></script>
+
+    <script>
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OGY2MmU5NGEzMzIxNDAwMTE5MzVlNTMiLCJ1c2VybmFtZSI6ImFkbWluIiwibmFtZSI6ImFkbWluIiwiZW1haWwiOiI5OWxlb25jaGFuZ0BnbWFpbC5jb20iLCJpYXQiOjE0OTI5NTA2MDgsImV4cCI6MTQ5MzAzNzAwOH0.Osr0oLJ6IEvo4V-OZH36E4LDULt7KpELhzVdUQtXxBg';
+        $(document).ready(function () {
+            $('#create_form').submit(function() {
+                $('#form_loader').addClass('active');
+
+                api('create form', 'POST', function(data) {
+                    $('.ui.modal').modal('hide');
+                    init();
+                }, $('#create_form').serialize());
+                return false;
+            });
+            init();
+        });
+
+        function init(){
+            api('get forms', 'GET', function(data) {
+                $('#form_list').html('');
+                $.each(data, function( index, value ) {
+                    //TODO: Update links
+                    $('#form_list').append('<a class="ui '+ (value.active ? "green":"red") +' card" href="form.html?id='+value._id+'">' +
+                        '<div class="content">' +
+                        '<div class="header">' + value.name + '</div>' +
+                        '<div class="meta">Created on '+ new Date(value.createdOn).toDateString() +'</div>' +
+                        '</div>' +
+                        '<div class="extra content"><span class="right floated">'+ (value.active ? "Active":"Inactive") +'</span><span><i class="user icon"></i>75 Submissions</span></div>' +
+                        '</a>');
+                });
+                $('#form_list').append('<a class="ui card" href="#" onClick="openModal()">' +
+                    '<div class="content">' +
+                    '<div class="description center aligned">' +
+                    '<div class="statistic">' +
+                    '<div class="value"><i class="huge plus icon"></i></div>' +
+                    '<div class="label">Create New</div></div></div></div></a>');
+                $('#form_loader').removeClass('active');
+            });
+        }
+
+
+
+        function openModal() {
+            $('.ui.modal')
+                .modal({
+                    onApprove : function() {
+                        $('#create_form').submit();
+                    }
+                })
+                .modal('show')
+            ;
+        }
+
+
+
+    </script>
+</head>
+<body>
+<div class="ui main container">
+    <div class="ui cards" id="form_list">
+        <div class="ui active inverted dimmer" id="form_loader">
+            <div class="ui text loader">Loading</div>
+        </div>
+    </div>
+</div>
+<div id="test"></div>
+
+<div class="ui modal">
+    <div class="header">
+        Create New Form
+    </div>
+    <div class="content">
+        <div class="description">
+            <form class="ui form" id="create_form">
+                <div class="required field">
+                    <label>Form Name</label>
+                    <input type="text" name="name" placeholder="My Awesome Form" required>
+                </div>
+                <div class="field">
+                    <label>Redirect page (optional)</label>
+                    <input type="url" name="redir_page" placeholder="http://google.com">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            Cancel
+        </div>
+        <div class="ui positive right labeled icon button">
+            Create
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+</body>
+</html>
