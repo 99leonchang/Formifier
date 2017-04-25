@@ -3,6 +3,7 @@ var url = '/api';
 //var url= 'https://calm-beach-46116.herokuapp.com/api';
 $.fn.api.settings.api = {
     'authenticate' : url+'/authenticate',
+    'logout' : url+'/logout',
     'get forms' : url+'/forms',
     'get single form' : url+'/forms/{id}',
     'get users' : url+'/users',
@@ -12,6 +13,24 @@ $.fn.api.settings.api = {
 
 //API Function
 var token;
+function heartbeat() {
+    $.ajax({
+        url: url+'/heartbeat',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            console.log(data);
+            if(data.success == false){
+                window.location.replace("/login");
+            }
+        },
+        error: function(err) { console.log(err); },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('x-access-token', token);
+        }
+    });
+}
+
 function api(action, method, parser, data) {
     var api_url = $.fn.api.settings.api[action];
     $.ajax({

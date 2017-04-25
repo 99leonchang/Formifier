@@ -29,8 +29,7 @@
         $(document).ready(function () {
             $('#login_form').submit(function() {
                 api('authenticate','post',function (data) {
-                    console.log('success');
-                    alert(data.token);
+                    window.location.replace("/dash");
                 }, $('#login_form').serialize());
                 return false;
             });
@@ -38,7 +37,7 @@
     </script>
 </head>
 <body>
-<div class="ui middle aligned center aligned grid">
+<div class="ui middle aligned center aligned grid container">
     <div class="column">
         <h2 class="ui header">
             <div class="content">

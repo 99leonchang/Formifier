@@ -21,8 +21,8 @@
     <script src="api.js"></script>
 
     <script>
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OGY2MmU5NGEzMzIxNDAwMTE5MzVlNTMiLCJ1c2VybmFtZSI6ImFkbWluIiwibmFtZSI6ImFkbWluIiwiZW1haWwiOiI5OWxlb25jaGFuZ0BnbWFpbC5jb20iLCJpYXQiOjE0OTI5NTA2MDgsImV4cCI6MTQ5MzAzNzAwOH0.Osr0oLJ6IEvo4V-OZH36E4LDULt7KpELhzVdUQtXxBg';
         $(document).ready(function () {
+            heartbeat();
             $('#create_form').submit(function() {
                 $('#form_loader').addClass('active');
 
@@ -40,7 +40,7 @@
                 $('#form_list').html('');
                 $.each(data, function( index, value ) {
                     //TODO: Update links
-                    $('#form_list').append('<a class="ui '+ (value.active ? "green":"red") +' card" href="form.html?id='+value._id+'">' +
+                    $('#form_list').append('<a class="ui '+ (value.active ? "green":"red") +' card" href="form?id='+value._id+'">' +
                         '<div class="content">' +
                         '<div class="header">' + value.name + '</div>' +
                         '<div class="meta">Created on '+ new Date(value.createdOn).toDateString() +'</div>' +

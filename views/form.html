@@ -20,8 +20,7 @@
     <script src="semantic/dist/semantic.min.js"></script>
     <script src="api.js"></script>
     <script>
-        //TODO: Authentication
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OGY2MmU5NGEzMzIxNDAwMTE5MzVlNTMiLCJ1c2VybmFtZSI6ImFkbWluIiwibmFtZSI6ImFkbWluIiwiZW1haWwiOiI5OWxlb25jaGFuZ0BnbWFpbC5jb20iLCJpYXQiOjE0OTI5NTA2MDgsImV4cCI6MTQ5MzAzNzAwOH0.Osr0oLJ6IEvo4V-OZH36E4LDULt7KpELhzVdUQtXxBg';
+        heartbeat();
         $(document).ready(function () {
             console.log($_GET('id'));
             //TODO: ID grabbing
@@ -31,6 +30,12 @@
             });
 
             $('.secondary.vertical.pointing.menu .item').tab();
+
+            $('#test').click(function(data){
+                api('logout','get',function (data) {
+                    console.log(data);
+                });
+            });
 
         });
 
@@ -97,7 +102,7 @@
                         </div>
                         <p id="textbox">Due to a database bug, we have disabled deletion of applications.</p>
                     </div>
-                    <div class="ui follow button" data-id="22">Test</div>
+                    <div class="ui follow button" id="test">Test</div>
                     <div class="ui statistic">
                         <div class="value">
                             <?= $num_app ?>

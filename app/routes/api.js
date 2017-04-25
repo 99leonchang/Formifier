@@ -17,7 +17,8 @@ app.set('superSecret', config.secret);
 exports.middleware = function(req, res, next) {
 
     // check header or url parameters or post parameters for token
-    var token = req.body.token || req.params.token || req.headers['x-access-token'];
+    //var token = req.body.token || req.params.token || req.headers['x-access-token'];
+    var token = req.cookies.token || req.body.token || req.params.token || req.headers['x-access-token'];
 
     // decode token
     if (token) {
@@ -35,8 +36,6 @@ exports.middleware = function(req, res, next) {
 
     } else {
 
-        // if there is no token
-        // return an error
         return res.status(403).send({
             success: false,
             message: 'No token provided.'
@@ -44,6 +43,10 @@ exports.middleware = function(req, res, next) {
 
     }
 
+};
+
+exports.heartbeat = function(req,res) {
+    res.json({ success: true });
 };
 
 exports.authenticate = function(req, res) {
@@ -75,6 +78,7 @@ exports.authenticate = function(req, res) {
                         expiresIn: 86400 // expires in 24 hours
                     });
 
+                    res.cookie('token',token, { maxAge: 900000, httpOnly: true });
                     res.json({
                         success: true,
                         message: 'Authenticated successfully!',

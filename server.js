@@ -6,6 +6,7 @@ var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var helmet      = require('helmet');
 var cors = require('cors');
+var cookieParser = require('cookie-parser')
 var path = require('path');
 
 var config = require('./config');
@@ -21,12 +22,13 @@ app.use(cors());
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(morgan('dev'));
 
 //===== Route Handlers =====//
 
 //Frontend Static Files
-app.use(express.static(path.join(__dirname, 'views')));
+app.use(express.static(path.join(__dirname, 'views'),{index:false,extensions:['html']}));
 
 //Tests
 app.post('/setup', routes.api.user_create); //Insecure, remove later
@@ -39,8 +41,14 @@ app.post('/s/:form_id', routes.form_submit);
 var apiRoutes = express.Router();
 
 apiRoutes.post('/authenticate', routes.api.authenticate);
+apiRoutes.get('/logout', function (req, res) {
+    res.cookie('token', '', {expires: new Date(0)})
+    res.redirect('/login');
+});
 
 apiRoutes.use(routes.api.middleware);
+
+apiRoutes.get('/heartbeat', routes.api.heartbeat);
 
 //Protected Routes
 apiRoutes.get('/', function(req, res) {

@@ -33,10 +33,14 @@ exports.form_submit = function(req, res) {
                 data: req.body
             });
             sub.save(function(err) {
+                //TODO: Better errors
                 if (err) return console.error('[ERROR] ', err);
 
                 console.log('Submission saved successfully');
-                res.json({ success: true });
+
+                //Redirects
+                if(form.redir_page) res.redirect(form.redir_page);
+                else res.redirect('/thankyou?ref='+req.get('Referrer'));
             });
         }
     });
