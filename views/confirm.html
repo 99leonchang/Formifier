@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Formifier - Thank You</title>
+
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <style>
+
+
+        body > .grid {
+            height: 100%;
+        }
+        .column {
+            max-width: 450px;
+        }
+        .ui.piled.segment {
+            margin: 0;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="api.js"></script>
+    <script src="functions.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var error = true;
+            if($_GET('token')){
+                token = $_GET('token');
+                custom_api('/users/confirm/'+token,'get', function(data) {
+                    $('#success').html(
+                        '<div class="ui piled segment">' +
+                            '<h2 class="ui icon header">' +
+                                '<i class="checkmark icon"></i>' +
+                                '<div class="content">' +
+                                    'Success!<div class="sub header">Your account is now active.</div>' +
+                                '</div>' +
+                            '</h2>' +
+                            '<a href="/login" class="ui fluid large button">Login</a>' +
+                        '</div>');
+                    error = false;
+                });
+            }
+            else displayError('No token provided.');
+            $('#form_loader').removeClass('active');
+            if(error){
+                $('#success').html('<div class="ui piled segment">' +
+                    '<h2 class="ui icon header">' +
+                    '<i class="x icon"></i>' +
+                    '<div class="content">Oh no!<div class="sub header">Perhaps your code expired.</div></div></h2>' +
+                    '<form id="resend">' +
+                    '<div class="ui action input"><input type="text" name="email" placeholder="Email" required>' +
+                    '<button class="ui button">Resend</button>' +
+                    '</div></form>' +
+                    '</div>');
+                $('#resend').submit(function() {
+                    api('resend','post', function(data) {
+                        $('#error_message').removeClass('negative').addClass('positive').html('<div class="header">Success!</div><p>Confirmation resent. Check your email.</p>');
+                    },$('#resend').serialize());
+                    return false;
+                });
+            }
+
+        });
+
+    </script>
+
+</head>
+<body>
+<div class="ui middle aligned center aligned grid container">
+    <div class="column">
+        <div class="ui active inverted dimmer" id="form_loader">
+            <div class="ui text loader">Loading</div>
+        </div>
+        <div id="error_message"></div>
+        <div id="success">
+
+        </div>
+        <div class="ui message">Powered by <a href="/">Formifier</a></div>
+    </div>
+</div>
+</body>
+</html>

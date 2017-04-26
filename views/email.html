@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><!-- Standard Meta --><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Formifier Email Confirmation</title>
+    <link href="https://calm-beach-46116.herokuapp.com/semantic/dist/semantic.min.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .ui.container {
+            padding-top: 2em;
+        }
+        body > .grid {
+            height: 100%;
+        }
+        .column {
+            max-width: 450px;
+        }
+        .ui.piled.segment {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="ui center aligned grid container">
+    <div class="column">
+        <div class="ui piled segment">
+            <h2 class="ui icon header">
+                <i class="edit icon"></i>
+                <div class="content">Formifier Confirmation</div>
+            </h2>
+            <p>Welcome to Formifier! We&#39;re glad you are joining us!</p>
+            <p>To begin using our services, please confirm your email. Please note, if you do not confirm your email, you will not be able to use our services.</p>
+            <a class="ui positive fluid large button" href="%confirm_url%">Confirm Email</a>
+            <%body%>
+        </div>
+        <div class="ui message">Powered by <a href="/">Formifier</a></div>
+    </div>
+</div>
+</body>
+</html>

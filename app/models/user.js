@@ -7,7 +7,7 @@ module.exports = mongoose.model('User', new Schema({
     password: { type: String, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
-    //email_activated: { type: Boolean, required: true},
+    email_activated: { type: Boolean, required: true, default: false },
     //temp_token: { type: Boolean, required: true },
     admin: Boolean
 }));

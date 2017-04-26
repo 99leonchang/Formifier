@@ -4,6 +4,9 @@ var url = '/api';
 $.fn.api.settings.api = {
     'authenticate' : url+'/authenticate',
     'logout' : url+'/logout',
+    'create user' : url+'/users/create',
+    'confirm user' : url+'/users/confirm',
+    'resend' : url+'/users/resend',
     'get forms' : url+'/forms',
     'get single form' : url+'/forms/{id}',
     'get users' : url+'/users',
@@ -31,7 +34,7 @@ function heartbeat() {
     });
 }
 
-function api(action, method, parser, data) {
+function api(action, method, callback, data) {
     var api_url = $.fn.api.settings.api[action];
     $.ajax({
         url: api_url, // The URL to the API. You can get this by clicking on "Show CURL example" from an API profile
@@ -41,7 +44,7 @@ function api(action, method, parser, data) {
         success: function(data) {
             console.log(data);
             if(data.success == false) displayError(data.message);
-            else parser(data);
+            else callback(data);
         },
         error: function(err) { console.log(err); },
         beforeSend: function(xhr) {
@@ -50,7 +53,7 @@ function api(action, method, parser, data) {
     });
 }
 
-function custom_api(action, method, parser, data) {
+function custom_api(action, method, callback, data) {
     var api_url = url+action;
     $.ajax({
         url: api_url, // The URL to the API. You can get this by clicking on "Show CURL example" from an API profile
@@ -60,7 +63,7 @@ function custom_api(action, method, parser, data) {
         success: function(data) {
             console.log(data);
             if(data.success == false) displayError(data.message);
-            else parser(data);
+            else callback(data);
         },
         error: function(err) { console.log(err); },
         beforeSend: function(xhr) {

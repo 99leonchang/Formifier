@@ -10,6 +10,8 @@ var config      = require('../../config');
 var jwt         = require('jsonwebtoken');
 var mongoose    = require('mongoose');
 var bcrypt      = require('bcrypt');
+var sendgrid    = require('sendgrid')(config.sendgrid);
+var helper      = require('sendgrid').mail;
 var Form        = require('../models/forms');
 var User        = require('../models/user');
 app.set('superSecret', config.secret);
@@ -107,7 +109,7 @@ exports.form_single =  function(req, res) {
         return res.json({success: false, message: 'Invalid ID'});
     }
 
-    Form.find({
+    Form.findOne({
         _id: mongoose.Types.ObjectId(req.params.form_id),
         userID: req.decoded._id
     }, function(err, forms) {
@@ -178,6 +180,11 @@ exports.user_update = function(req, res) {
 };
 
 exports.user_create = function(req, res) {
+    User.count({email: req.body.email}, function (err, count){
+        if(count>0){
+            return res.json({success: false, message: 'Email already exists!'});
+        }
+    });
     bcrypt.hash(req.body.password, 10, function(err, hash) {
         // store hash in database
         var newuser = new User({
@@ -187,9 +194,119 @@ exports.user_create = function(req, res) {
             email: req.body.email
             //admin: true
         });
-        newuser.save(function(err) {
+        newuser.save(function(err, user) {
             if (err) return res.json({success: false, message: err});
-            res.json({ success: true });
+
+            var from_email = new helper.Email(config.host_email);
+            var to_email = new helper.Email(user.email);
+            var subject = 'Formifier Email Confirmation';
+            var content = new helper.Content(
+                'text/html', '<p style="color:lightgrey; margin-top: 1em;">This message was triggered by a user signup on the Formifier system. If you have no recollection of singing up, you can safely ignore this email.</p>');
+            var mail = new helper.Mail(from_email, subject, to_email, content);
+
+            var payload = {
+                "_id": user._id,
+                "username": user.username,
+                "name": user.name,
+                "email": user.email
+            };
+
+            var token = jwt.sign(payload, app.get('superSecret'), {
+                expiresIn: 86400 // expires in 24 hours
+            });
+
+            mail.personalizations[0].addSubstitution(
+                new helper.Substitution('%confirm_url%', config.host+'/confirm?token='+token));
+            mail.setTemplateId(config.templates.confirm);
+
+
+            var request = sendgrid.emptyRequest({
+                method: 'POST',
+                path: '/v3/mail/send',
+                body: mail.toJSON(),
+            });
+
+            sendgrid.API(request, function(error, response) {
+                if (err) {
+                    return res.json({success: false, message: err});
+                } else {
+                    res.json({ success: true });
+                }
+            });
+
         });
+    });
+};
+
+exports.user_confirm = function(req, res){
+    jwt.verify(req.params.token, app.get('superSecret'), function(err, decoded) {
+        if (err) {
+            return res.json({ success: false, message: 'Failed to verify token.' });
+        } else {
+            // if everything is good, save to request for use in other routes
+            User.findById(decoded._id, {"email_activated": true}, function(err, user) {
+                if (err) return res.json({success: false, message: err});
+
+                if(user.email_activated) return res.json({success: false, message: "User already verified."});
+
+                user.email_activated = true;
+
+                user.save(function(err) {
+                    if(err) return res.json({success: false, message: err});
+                    res.json({success: true});
+                });
+            });
+        }
+    });
+};
+
+exports.user_resend = function(req, res){
+    User.findOne({
+        email: req.body.email
+    }, function(err, user) {
+        if (err) {
+            return res.json({ success: false, message: err });
+        } else {
+            if(user.email_activated){
+                return res.json({ success: false, message: 'User already activated.' });
+            } else {
+                var from_email = new helper.Email(config.host_email);
+                var to_email = new helper.Email(user.email);
+                var subject = 'Formifier Email Confirmation';
+                var content = new helper.Content(
+                    'text/html', '<p style="color:lightgrey; margin-top: 1em;">This message was triggered by a user signup on the Formifier system. If you have no recollection of singing up, you can safely ignore this email.</p>');
+                var mail = new helper.Mail(from_email, subject, to_email, content);
+
+                var payload = {
+                    "_id": user._id,
+                    "username": user.username,
+                    "name": user.name,
+                    "email": user.email
+                };
+
+                var token = jwt.sign(payload, app.get('superSecret'), {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+
+                mail.personalizations[0].addSubstitution(
+                    new helper.Substitution('%confirm_url%', config.host+'/confirm?token='+token));
+                mail.setTemplateId(config.templates.confirm);
+
+
+                var request = sendgrid.emptyRequest({
+                    method: 'POST',
+                    path: '/v3/mail/send',
+                    body: mail.toJSON(),
+                });
+
+                sendgrid.API(request, function(error, response) {
+                    if (err) {
+                        return res.json({success: false, message: err});
+                    } else {
+                        res.json({ success: true });
+                    }
+                });
+            }
+        }
     });
 };

@@ -5,12 +5,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Formifier - Login</title>
+    <title>Formifier - Register</title>
 
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
     <style>
-
-
         body > .grid {
             height: 100%;
         }
@@ -28,8 +26,8 @@
 
     <script>
         $(document).ready(function () {
-            $('#login_form').submit(function() {
-                api('authenticate','post',function (data) {
+            $('#register_form').submit(function() {
+                api('create user','post',function (data) {
                     window.location.replace("/dash");
                 }, $('#login_form').serialize());
                 return false;
@@ -42,7 +40,7 @@
     <div class="column">
         <h2 class="ui header">
             <div class="content">
-                Login to Formifier
+                Make a Formifier Account
             </div>
         </h2>
         <div id="error_message"></div>
@@ -61,13 +59,13 @@
                     </div>
                 </div>
                 <button class="ui fluid large right labeled icon submit button" type="submit">
-                    Login
-                    <i class="unlock icon"></i>
+                    Register
+                    <i class="send icon"></i>
                 </button>
             </div>
 
         </form>
-        <div class="ui message">Need an account? <a href="/register">Sign Up</a></div>
+        <div class="ui message">Already have an account? <a href="/login">Log In</a></div>
     </div>
 </div>
 </body>

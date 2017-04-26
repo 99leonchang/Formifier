@@ -1,7 +1,6 @@
 var express 	= require('express');
 var app         = express();
 var bodyParser  = require('body-parser');
-var mustacheExpress = require('mustache-express');
 var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var helmet      = require('helmet');
@@ -46,11 +45,15 @@ apiRoutes.get('/logout', function (req, res) {
     res.redirect('/login');
 });
 
+apiRoutes.get('/users/confirm/:token', routes.api.user_confirm);
+apiRoutes.post('/users/resend', routes.api.user_resend);
+apiRoutes.post('/users/create', routes.api.user_create);
+
+//Protected Routes
 apiRoutes.use(routes.api.middleware);
 
 apiRoutes.get('/heartbeat', routes.api.heartbeat);
 
-//Protected Routes
 apiRoutes.get('/', function(req, res) {
     res.json({ message: 'Welcome to the Formifier backend API.' });
 });
@@ -65,9 +68,7 @@ apiRoutes.put('/forms/:form_id', routes.api.form_update);
 //TODO: Verify admin/correct user
 apiRoutes.get('/users', routes.api.user_list);
 apiRoutes.get('/users/:user_id', routes.api.user_single);
-apiRoutes.post('/users/create', routes.api.user_create);
-apiRoutes.put('/users/:user_id', routes.api.user_create);
-
+apiRoutes.put('/users/:user_id', routes.api.user_update);
 
 
 //Development
