@@ -14,6 +14,7 @@ var sendgrid    = require('sendgrid')(config.sendgrid);
 var helper      = require('sendgrid').mail;
 var Form        = require('../models/forms');
 var User        = require('../models/user');
+var Sub         = require('../models/submission');
 app.set('superSecret', config.secret);
 //----- Authentication -----//
 exports.middleware = function(req, res, next) {
@@ -119,6 +120,14 @@ exports.form_single =  function(req, res) {
     });
 };
 
+exports.form_submissions = function(req, res){
+    Sub.find({
+        formID : req.params.form_id
+    }, function(err, subs) {
+        res.json(subs);
+    });
+};
+
 exports.form_create = function(req, res) {
     var form = new Form({
         userID: req.decoded._id,
@@ -152,6 +161,8 @@ exports.form_update = function(req, res) {
 //----- Users -----//
 exports.user_list = function(req, res) {
     User.find({}, {"username": true, "name": true, "email": true, "admin": true}, function(err, users) {
+        if (err) return res.json({success: false, message: err});
+
         res.json(users);
     });
 };
@@ -186,6 +197,8 @@ exports.user_create = function(req, res) {
         }
     });
     bcrypt.hash(req.body.password, 10, function(err, hash) {
+        if (err) return res.json({success: false, message: err});
+
         // store hash in database
         var newuser = new User({
             username: req.body.username,
@@ -226,7 +239,7 @@ exports.user_create = function(req, res) {
                 body: mail.toJSON(),
             });
 
-            sendgrid.API(request, function(error, response) {
+            sendgrid.API(request, function(err, response) {
                 if (err) {
                     return res.json({success: false, message: err});
                 } else {

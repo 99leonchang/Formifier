@@ -8,6 +8,7 @@
     <title>Formifier - Form</title>
 
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/dataTables.semanticui.min.js">
     <style>
         body > .ui.container {
             margin-top: 3em;
@@ -19,13 +20,20 @@
             crossorigin="anonymous"></script>
     <script src="semantic/dist/semantic.min.js"></script>
     <script src="api.js"></script>
+    <script src="js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.semanticui.min.js"></script>
     <script>
         heartbeat();
         $(document).ready(function () {
             console.log($_GET('id'));
             //TODO: ID grabbing
             custom_api('/forms/'+$_GET('id'), 'GET', function(data) {
-                populate(data[0]);
+                populate(data);
+                //$('#test').html(JSON.stringify(data));
+            });
+
+            custom_api('/forms/'+$_GET('id')+'/submissions', 'GET', function(data) {
+                submission_populate(data);
                 //$('#test').html(JSON.stringify(data));
             });
 
@@ -62,6 +70,33 @@
             $('#form_loader').removeClass('active');
         }
 
+        function submission_populate(form_data){
+            var columns = [];
+            var columns_list = [];
+            var table_data = [];
+            //Grab column data from first submission
+            $.each(form_data[0].data, function( index, value ) {
+                columns.push({ title : index });
+                columns_list.push(index);
+            });
+            //Format data array holy shit three layers this is bad
+            $.each(form_data, function( index, value ) {
+                var single_data = [];
+                $.each(columns_list, function(index, column) {
+                    if(value.data[column] === undefined) value.data[column] = "N/A";
+                    single_data.push(value.data[column]);
+                });
+                table_data.push(single_data);
+            });
+
+            console.log(columns);
+
+            $('#submissions_table').DataTable( {
+                data: table_data,
+                columns: columns
+            } );
+        }
+
 
 
     </script>
@@ -81,7 +116,7 @@
         <div class="row">
             <div class="four wide column">
                 <div class="ui secondary vertical pointing menu">
-                    <a class="item active" data-tab="forms" data-id="test">
+                    <a class="item active" data-tab="glance">
                         At-A-Glance
                     </a>
                     <a class="item" data-tab="submissions">
@@ -95,12 +130,12 @@
 
             <div class="twelve wide column">
 
-                <div class="ui tab active center aligned" data-tab="first">
+                <div class="ui tab active center aligned" data-tab="glance">
                     <div class="ui message">
                         <div class="header">
-                            Changes in service
+                            Alpha (4f45d15)
                         </div>
-                        <p id="textbox">Due to a database bug, we have disabled deletion of applications.</p>
+                        <p id="textbox">The Formifier service is in Alpha. There are no guarantees included except for the existence of bugs.</p>
                     </div>
                     <div class="ui follow button" id="test">Test</div>
                     <div class="ui statistic">
@@ -119,17 +154,12 @@
                             Approved Members
                         </div>
                     </div>
-                    <p>UCD Admin system is currently in Beta. If any problems occur, please report them to <a href="mailto:me@99leonchang.com">Leon</a>.</p>
+                    <p>Please note: submissions data tables will be formatted in terms of the first submitted form. All added rows to future submissions will be ignored. This can be solved by deleting all submission data.</p>
                 </div>
-                <div class="ui tab" data-tab="second">
+                <div class="ui tab" data-tab="submissions">
                     <div class="row">
                         <div class="column">
-                            <div class="ui message">
-                                <div class="header" id="jsondata">
-                                    Changes in service
-                                </div>
-                                <p>Due to a database bug, we have disabled deletion of applications.</p>
-                            </div>
+                            <table id="submissions_table" class="ui celled table" cellspacing="0" width="100%"></table>
                         </div>
                     </div>
                 </div>
@@ -141,7 +171,7 @@
                             <form class="ui form" id="form_settings">
                                 <div class="field">
                                     <label>Form Name</label>
-                                    <input type="text" name="name" value="Default Name" id="name">
+                                    <input type="text" name="name" value="Default Name" id="name" required>
                                 </div>
                                 <div class="field">
                                     <label>Redirect page (optional)</label>

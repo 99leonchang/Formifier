@@ -61,6 +61,7 @@ apiRoutes.get('/', function(req, res) {
 //Forms
 apiRoutes.get('/forms', routes.api.form_list);
 apiRoutes.get('/forms/:form_id', routes.api.form_single);
+apiRoutes.get('/forms/:form_id/submissions', routes.api.form_submissions);
 apiRoutes.post('/forms/create', routes.api.form_create);
 apiRoutes.put('/forms/:form_id', routes.api.form_update);
 
@@ -72,11 +73,6 @@ apiRoutes.put('/users/:user_id', routes.api.user_update);
 
 
 //Development
-apiRoutes.get('/submissions', function(req, res) {
-    Sub.find({}, function(err, subs) {
-        res.json(subs);
-    });
-});
 
 apiRoutes.get('/check', function(req, res) {
     res.json(req.decoded);

@@ -29,7 +29,7 @@ exports.form_submit = function(req, res) {
         } else if (form) {
             // save submission
             var sub = new Sub({
-                formID: req.params.id,
+                formID: req.params.form_id,
                 data: req.body
             });
             sub.save(function(err) {
