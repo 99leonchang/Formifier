@@ -11,7 +11,7 @@ var User        = require('./models/user');
 app.set('superSecret', config.secret);
 
 //===== FORM FUNCTIONS =====//
-//TODO: Check active, referrer redirect
+//TODO: Check active
 exports.form_submit = function(req, res) {
     //Validate formID
     if(!mongoose.Types.ObjectId.isValid(req.params.form_id)){
@@ -22,13 +22,15 @@ exports.form_submit = function(req, res) {
         _id: mongoose.Types.ObjectId(req.params.form_id)
     }, function(err, form) {
 
-        if (err) res.redirect('/error?ref='+req.get('Referrer')+'&error='+err);
+        if (err) return res.redirect('/error?ref='+req.get('Referrer')+'&error='+encodeURI(err));
 
         if (!form) {
             //res.json({success: false, message: 'Submission failed. Form not found.'});
             var message = 'Submission failed. Form not found.';
-            return res.redirect('/error?ref='+req.get('Referrer')+'&error='+message)
+            return res.redirect('/error?ref='+req.get('Referrer')+'&error='+encodeURI(message));
         } else if (form) {
+            if(!form.active) return res.redirect('/error?ref='+req.get('Referrer')+'&error=Form%20not%20active');
+
             // save submission
             var sub = new Sub({
                 formID: req.params.form_id,
@@ -36,7 +38,7 @@ exports.form_submit = function(req, res) {
             });
             sub.save(function(err) {
                 //TODO: Better errors
-                if (err) res.redirect('/error?ref='+req.get('Referrer')+'&error='+err);
+                if (err) return res.redirect('/error?ref='+req.get('Referrer')+'&error='+encodeURI(err));
 
                 console.log('Submission saved successfully');
 
