@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 //===== Route Handlers =====//
 
 //Frontend Static Files
-app.use(express.static(path.join(__dirname, 'views'),{index:false,extensions:['html']}));
+app.use(express.static(path.join(__dirname, 'views'),{index:"index.html",extensions:['html']}));
 
 //Tests
 app.post('/setup', routes.api.user_create); //Insecure, remove later
@@ -39,6 +39,7 @@ app.post('/s/:form_id', routes.form_submit);
 //API
 var apiRoutes = express.Router();
 
+//Non-protected
 apiRoutes.post('/authenticate', routes.api.authenticate);
 apiRoutes.get('/logout', function (req, res) {
     res.cookie('token', '', {expires: new Date(0)})
@@ -48,6 +49,8 @@ apiRoutes.get('/logout', function (req, res) {
 apiRoutes.get('/users/confirm/:token', routes.api.user_confirm);
 apiRoutes.post('/users/resend', routes.api.user_resend);
 apiRoutes.post('/users/create', routes.api.user_create);
+
+apiRoutes.get('/forms/:form_id/info', routes.api.form_info);
 
 //Protected Routes
 apiRoutes.use(routes.api.middleware);

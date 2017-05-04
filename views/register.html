@@ -29,7 +29,7 @@
             $('#register_form').submit(function() {
                 api('create user','post',function (data) {
                     window.location.replace("/dash");
-                }, $('#login_form').serialize());
+                }, $('#register_form').serialize());
                 return false;
             });
         });
@@ -44,18 +44,30 @@
             </div>
         </h2>
         <div id="error_message"></div>
-        <form class="ui large form" id="login_form">
+        <form class="ui large form" id="register_form">
             <div class="ui piled segment">
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
-                        <input type="text" name="username" placeholder="Formifier Username">
+                        <input type="text" name="username" placeholder="Formifier Username" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="pencil icon"></i>
+                        <input type="text" name="name" placeholder="Name" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="mail icon"></i>
+                        <input type="email" name="email" placeholder="Email" required>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
-                        <input type="password" name="password" placeholder="Password">
+                        <input type="password" name="password" placeholder="Password" required>
                     </div>
                 </div>
                 <button class="ui fluid large right labeled icon submit button" type="submit">

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Formifier - Error</title>
+
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <style>
+
+
+        body > .grid {
+            height: 100%;
+        }
+        .column {
+            max-width: 450px;
+        }
+        .ui.piled.segment {
+            margin: 0;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var ref, error;
+            if($_GET('ref')) ref = $_GET('ref');
+            else ref = "/";
+            if($_GET('error')) $('#error_message').addClass("ui negative message").html("<p>"+decodeURI($_GET('error'))+"</p>");
+            $('#ref').attr("href", ref)
+        });
+        function $_GET(param) {
+            var vars = {};
+            window.location.href.replace( location.hash, '' ).replace(
+                /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                function( m, key, value ) { // callback
+                    vars[key] = value !== undefined ? value : '';
+                }
+            );
+
+            if ( param ) {
+                return vars[param] ? vars[param] : null;
+            }
+            return vars;
+        }
+    </script>
+
+</head>
+<body>
+<div class="ui middle aligned center aligned grid container">
+    <div class="column">
+
+        <div class="ui piled segment">
+            <h2 class="ui icon header">
+                <i class="x icon"></i>
+                <div class="content">
+                    Error!
+                    <div class="sub header">There was an error processing your submission.</div>
+                </div>
+            </h2>
+            <div id="error_message"></div>
+            <a href="" class="ui fluid large button" id="ref">Go Back</a>
+        </div>
+        <div class="ui message">Powered by <a href="/">Formifier</a></div>
+    </div>
+</div>
+</body>
+</html>

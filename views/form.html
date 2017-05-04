@@ -13,6 +13,18 @@
         body > .ui.container {
             margin-top: 3em;
         }
+        pre {
+            line-height: 0.7em;
+            color: #555555;
+            padding: 1em 1em;
+            background: #f4f4f4;
+            border: solid 1px #e1e1e1;
+            border-radius: .28571429rem;
+        }
+        code {
+            font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+            color: #555555;
+        }
     </style>
     <script
             src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -39,12 +51,19 @@
 
             $('.secondary.vertical.pointing.menu .item').tab();
 
+            $('#form_settings').submit(function() {
+                $('.submit.button').addClass('loading');
+                custom_api('/forms/'+$_GET('id'), 'PUT', function(data) {
+                    $('.submit.button').removeClass("loading").state('flash text','Settings Saved!<i class="save icon"></i>');
+                }, $('#form_settings').serialize());
+                return false;
+            });
+
             $('#test').click(function(data){
                 api('logout','get',function (data) {
                     console.log(data);
                 });
             });
-
         });
 
 
@@ -67,34 +86,47 @@
             $('#page_name').html(form_data.name);
             $('#name').val(form_data.name);
             $('#redir_page').val(form_data.redir_page);
+            $('#active')
+                .val(form_data.active)
+                .change(function(){
+                    cb = $(this);
+                    cb.val(cb.prop('checked'));
+                })
+                .prop('checked', form_data.active);
             $('#form_loader').removeClass('active');
+            $('#form_id').html(form_data._id);
+
         }
 
         function submission_populate(form_data){
-            var columns = [];
-            var columns_list = [];
-            var table_data = [];
-            //Grab column data from first submission
-            $.each(form_data[0].data, function( index, value ) {
-                columns.push({ title : index });
-                columns_list.push(index);
-            });
-            //Format data array holy shit three layers this is bad
-            $.each(form_data, function( index, value ) {
-                var single_data = [];
-                $.each(columns_list, function(index, column) {
-                    if(value.data[column] === undefined) value.data[column] = "N/A";
-                    single_data.push(value.data[column]);
+            if(form_data.length > 0) {
+                var columns = [];
+                var columns_list = [];
+                var table_data = [];
+                //Grab column data from first submission
+                $.each(form_data[0].data, function (index, value) {
+                    columns.push({title: index});
+                    columns_list.push(index);
                 });
-                table_data.push(single_data);
-            });
+                //Format data array holy shit three layers this is bad
+                $.each(form_data, function (index, value) {
+                    var single_data = [];
+                    $.each(columns_list, function (index, column) {
+                        if (value.data[column] === undefined) value.data[column] = "N/A";
+                        single_data.push(value.data[column]);
+                    });
+                    table_data.push(single_data);
+                });
 
-            console.log(columns);
+                console.log(columns);
 
-            $('#submissions_table').DataTable( {
-                data: table_data,
-                columns: columns
-            } );
+                $('#submissions_table').DataTable({
+                    data: table_data,
+                    columns: columns
+                });
+            } else {
+                $('#submissions').html("<p>No submissions yet</p>");
+            }
         }
 
 
@@ -137,28 +169,25 @@
                         </div>
                         <p id="textbox">The Formifier service is in Alpha. There are no guarantees included except for the existence of bugs.</p>
                     </div>
+                    <pre><code>&lt;form action=&quot;https://formifier.99leonchang.com/s/<span id="form_id"></span>&quot; method=&quot;POST&quot;&gt;<br/>
+    &lt;input type=&quot;text&quot; name=&quot;Name&quot;&gt;<br/>
+    &lt;input type=&quot;email&quot; name=&quot;Email&quot;&gt;<br/>
+    &lt;input type=&quot;submit&quot; value=&quot;Send&quot;&gt;<br/>
+&lt;/form&gt;</code></pre>
                     <div class="ui follow button" id="test">Test</div>
                     <div class="ui statistic">
                         <div class="value">
-                            <?= $num_app ?>
+                            15
                         </div>
                         <div class="label">
-                            Applications
-                        </div>
-                    </div>
-                    <div class="ui statistic">
-                        <div class="value">
-                            <?= $num_approve ?>
-                        </div>
-                        <div class="label">
-                            Approved Members
+                            Submissions
                         </div>
                     </div>
                     <p>Please note: submissions data tables will be formatted in terms of the first submitted form. All added rows to future submissions will be ignored. This can be solved by deleting all submission data.</p>
                 </div>
                 <div class="ui tab" data-tab="submissions">
                     <div class="row">
-                        <div class="column">
+                        <div class="column" id="submissions">
                             <table id="submissions_table" class="ui celled table" cellspacing="0" width="100%"></table>
                         </div>
                     </div>
@@ -168,7 +197,9 @@
                     <div class="row">
                         <div class="column">
                             <div class="ui dividing header">Settings</div>
+                            <div id="error_message"></div>
                             <form class="ui form" id="form_settings">
+                                <input type="hidden" name="active" value="false">
                                 <div class="field">
                                     <label>Form Name</label>
                                     <input type="text" name="name" value="Default Name" id="name" required>
@@ -177,11 +208,18 @@
                                     <label>Redirect page (optional)</label>
                                     <input type="url" name="redir_page" value="" id="redir_page">
                                 </div>
-                                    <button class="ui positive large right labeled icon submit button" type="submit">
-                                        Save
-                                        <i class="save icon"></i>
-                                    </button>
-
+                                <div class="ui segment">
+                                    <div class="field">
+                                        <div class="ui toggle checkbox">
+                                            <input type="checkbox" name="active" value="" id="active">
+                                            <label>Form Active</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="ui positive large right labeled icon submit button" type="submit">
+                                    Save
+                                    <i class="save icon"></i>
+                                </button>
                             </form>
                         </div>
                     </div>

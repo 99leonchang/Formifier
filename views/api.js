@@ -74,5 +74,5 @@ function custom_api(action, method, callback, data) {
 
 function displayError(message){
     console.log(message);
-    $('#error_message').addClass('ui negative message').html('<div class="header">Error!</div><p>' + message + '</p>');
+    $('#error_message').removeClass().addClass('ui negative message').html('<div class="header">Error!</div><p>' + message + '</p>');
 }

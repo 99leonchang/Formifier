@@ -15,17 +15,19 @@ app.set('superSecret', config.secret);
 exports.form_submit = function(req, res) {
     //Validate formID
     if(!mongoose.Types.ObjectId.isValid(req.params.form_id)){
-        return res.json({success: false, message: 'Invalid ID'});
+        return res.redirect('/error?ref='+req.get('Referrer')+'&error=Invalid%20ID');
     }
 
     Form.findOne({
         _id: mongoose.Types.ObjectId(req.params.form_id)
     }, function(err, form) {
 
-        if (err) return console.error('[ERROR] ', err);
+        if (err) res.redirect('/error?ref='+req.get('Referrer')+'&error='+err);
 
         if (!form) {
-            res.json({success: false, message: 'Submission failed. Form not found.'});
+            //res.json({success: false, message: 'Submission failed. Form not found.'});
+            var message = 'Submission failed. Form not found.';
+            return res.redirect('/error?ref='+req.get('Referrer')+'&error='+message)
         } else if (form) {
             // save submission
             var sub = new Sub({
@@ -34,7 +36,7 @@ exports.form_submit = function(req, res) {
             });
             sub.save(function(err) {
                 //TODO: Better errors
-                if (err) return console.error('[ERROR] ', err);
+                if (err) res.redirect('/error?ref='+req.get('Referrer')+'&error='+err);
 
                 console.log('Submission saved successfully');
 

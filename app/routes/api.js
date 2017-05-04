@@ -105,6 +105,28 @@ exports.form_list =  function(req, res) {
     });
 };
 
+exports.form_info =  function(req, res) {
+    if(!mongoose.Types.ObjectId.isValid(req.params.form_id)){
+        return res.json({success: false, message: 'Invalid ID'});
+    }
+
+    Form.findOne({
+        _id: mongoose.Types.ObjectId(req.params.form_id)
+    }, {"name": true, "active": true}, function(err, forms) {
+        if (err) return res.json({success: false, message: err});
+
+        Sub.count({formID: req.params.form_id}, function(err, c) {
+            if (err) return res.json({success: false, message: err});
+            var data = {
+                "name" : forms.name,
+                "active" : forms.active,
+                "submissions" : c
+            };
+            res.json(data);
+        });
+    });
+};
+
 exports.form_single =  function(req, res) {
     if(!mongoose.Types.ObjectId.isValid(req.params.form_id)){
         return res.json({success: false, message: 'Invalid ID'});
