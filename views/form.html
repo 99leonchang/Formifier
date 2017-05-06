@@ -8,7 +8,7 @@
     <title>Formifier - Form</title>
 
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
-    <link rel="stylesheet" type="text/css" href="css/dataTables.semanticui.min.js">
+    <link rel="stylesheet" type="text/css" href="css/dataTables.semanticui.min.css">
     <style>
         body > .ui.container {
             margin-top: 3em;
@@ -33,20 +33,17 @@
     <script src="semantic/dist/semantic.min.js"></script>
     <script src="api.js"></script>
     <script src="js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.semanticui.min.js"></script>
+    <script src="js/dataTables.semanticui.min.js"></script>
     <script>
         heartbeat();
         $(document).ready(function () {
-            console.log($_GET('id'));
-            //TODO: ID grabbing
-            custom_api('/forms/'+$_GET('id'), 'GET', function(data) {
-                populate(data);
-                //$('#test').html(JSON.stringify(data));
-            });
-
+            //TODO: Better ID grabbing
             custom_api('/forms/'+$_GET('id')+'/submissions', 'GET', function(data) {
                 submission_populate(data);
-                //$('#test').html(JSON.stringify(data));
+            });
+
+            custom_api('/forms/'+$_GET('id'), 'GET', function(data) {
+                populate(data);
             });
 
             $('.secondary.vertical.pointing.menu .item').tab();
@@ -93,14 +90,14 @@
                     cb.val(cb.prop('checked'));
                 })
                 .prop('checked', form_data.active);
-            $('#form_loader').removeClass('active');
             $('#form_id').html(form_data._id);
-
+            $('#form_loader').removeClass('active');
         }
 
         function submission_populate(form_data){
+            $('#num_submissions').html(form_data.length);
             if(form_data.length > 0) {
-                var columns = [];
+                var columns = [{title: 'Timestamp'}];
                 var columns_list = [];
                 var table_data = [];
                 //Grab column data from first submission
@@ -110,7 +107,8 @@
                 });
                 //Format data array holy shit three layers this is bad
                 $.each(form_data, function (index, value) {
-                    var single_data = [];
+                    date = new Date(value.timestamp);
+                    var single_data = [date.toDateString()+' '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()];
                     $.each(columns_list, function (index, column) {
                         if (value.data[column] === undefined) value.data[column] = "N/A";
                         single_data.push(value.data[column]);
@@ -176,8 +174,8 @@
 &lt;/form&gt;</code></pre>
                     <div class="ui follow button" id="test">Test</div>
                     <div class="ui statistic">
-                        <div class="value">
-                            15
+                        <div class="value" id="num_submissions">
+                            0
                         </div>
                         <div class="label">
                             Submissions
